@@ -14,4 +14,4 @@ public class Case {
 	public void setDrapeau(boolean d)	{ drapeau = d; }
 	public void setValeur(int v)		{ valeur = v;}
 }
-//Test PUSH
+//Test PUSH BENOIT
