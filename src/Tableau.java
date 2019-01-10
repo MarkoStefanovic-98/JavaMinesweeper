@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Tableau {
 	enum Difficulte {Facile, Moyen, Difficile};
-	int nombreCase, nombreMine, caseChoisie, nombreCoup;
+	int nombreCase, nombreMine, caseChoisie, nombreCoup, nbCaseDecouverte, nbChoixRestant;
 	Difficulte difficulte;
 	Scanner clavier = new Scanner(System.in);
 	Case tableauCases[][];
@@ -12,10 +12,14 @@ public class Tableau {
 	boolean bombeDecouverte = false;
 	
 	void afficher(){
-		boolean perdu = false;
+		boolean perdu = false, gagne = false;
 		do
 		{
-			System.out.println("\nTABLEAU | " + nombreMine + " mines | "+(nombreCase*nombreCase-nombreCoup)+" choix restants | "+nombreCoup+" coups effectués");
+			nbCaseDecouverte = 0;
+			for(int x=0; x<nombreCase; x++) for(int y=0; y<nombreCase; y++) if(tableauCases[x][y].isDecouverte()) nbCaseDecouverte++; 
+			nbChoixRestant = nombreCase*nombreCase - nbCaseDecouverte - nombreMine; 
+			if(nbChoixRestant==0) gagne = true;
+			System.out.println("\nGRILLE | " + nombreMine + " mines | "+(nbChoixRestant)+" choix restants | "+nombreCoup+" coups effectués");
 
 			int z=0; 
 			for(int x=0; x<nombreCase; x++) {
@@ -30,7 +34,7 @@ public class Tableau {
 				for(int y=0; y<nombreCase; y++) {
 					if(tableauCases[x][y].isBombe() && bombeDecouverte)
 					{ System.out.print(" X "); perdu=true;}
-					else if(tableauCases[x][y].isDecouverte())
+					else if(tableauCases[x][y].isDecouverte() || bombeDecouverte)
 						System.out.print(" "+tableauCases[x][y].getValeur()+" ");
 					else
 						System.out.print(" - ");
@@ -38,7 +42,11 @@ public class Tableau {
 				System.out.println();
 			}
 			
-			if(!perdu) {
+			if(perdu){ 
+				System.out.println("\nPERDU !");
+			}
+			else if(gagne)	{ System.out.println("\nGG WP !");}
+			else {
 				System.out.print("\nChoisir une case : ");
 				try { caseChoisie = clavier.nextInt();  } // si l'utilisateur n'entre pas un nombre
 				catch (InputMismatchException e) { System.out.println("ERREUR : Entrez un nombre !"); break; }
@@ -46,8 +54,7 @@ public class Tableau {
 				decouvrirCase();
 				nombreCoup++;
 			}
-			else System.out.println("\nPERDU !");
-		}while(!perdu);
+		}while(!perdu && !gagne);
 	}
 
 	void decouvrirCase() {
@@ -61,13 +68,13 @@ public class Tableau {
 		if(tableauCases[X][Y].isBombe()) bombeDecouverte = true;
 		for(a=-1; a<2; a++)
 			for(b=-1; b<2; b++)
-			{ 
+			{ // propagation des zéros (pas tout à fait)
 				try {
 					if(tableauCases[X+a][Y+b].getValeur() == 0)
 						tableauCases[X+a][Y+b].setDecouverte(true);
 				}
-				catch(ArrayIndexOutOfBoundsException e) {}
-			}
+				catch(ArrayIndexOutOfBoundsException e) {} // si on dépasse la taille de la matrice
+				}
 	}
 	
 	void reglageDifficulte(Difficulte diff) {
@@ -109,8 +116,6 @@ public class Tableau {
 						try { if(tableauCases[x+a][y+b].isBombe()) z++;} 
 						catch(ArrayIndexOutOfBoundsException e) {}
 					}
-				
-			 	if (tableauCases[x][y].isBombe() == false)
 			 		tableauCases[x][y].setValeur(z);
 			 }
 	}
