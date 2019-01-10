@@ -19,7 +19,7 @@ public class Tableau {
 			for(int x=0; x<nombreCase; x++) for(int y=0; y<nombreCase; y++) if(tableauCases[x][y].isDecouverte()) nbCaseDecouverte++; 
 			nbChoixRestant = nombreCase*nombreCase - nbCaseDecouverte - nombreMine; 
 			if(nbChoixRestant==0) gagne = true;
-			System.out.println("\nGRILLE | " + nombreMine + " mines | "+(nbChoixRestant)+" choix restants | "+nombreCoup+" coups effectués");
+			System.out.println("\nTABLEAU | " + nombreMine + " mines | "+(nbChoixRestant)+" choix restants | "+nombreCoup+" coups effectués");
 
 			int z=0; 
 			for(int x=0; x<nombreCase; x++) {
@@ -58,23 +58,40 @@ public class Tableau {
 	}
 
 	void decouvrirCase() {
-		int x=0, y=0, X=0, Y=0, a=0, b=0, z=0;
-		for(x=0; x<nombreCase; x++)
-			for(y=0; y<nombreCase; y++)
+		int X=0, Y=0, z=0;
+		for(int x=0; x<nombreCase; x++)
+			for(int y=0; y<nombreCase; y++)
 				if(++z == caseChoisie) { X=x; Y=y; }
 			
 
 		tableauCases[X][Y].setDecouverte(true);
-		if(tableauCases[X][Y].isBombe()) bombeDecouverte = true;
-		for(a=-1; a<2; a++)
-			for(b=-1; b<2; b++)
-			{ // propagation des zéros (pas tout à fait)
+		if(tableauCases[X][Y].isBombe())
+			bombeDecouverte = true;
+
+		
+		if(tableauCases[X][Y].getValeur()==0)
+			propagationZero(X, Y);
+	}
+
+	void propagationZero(int X, int Y)
+	{
+		for(int a=-1; a<2; a++)
+			for(int b=-1; b<2; b++)
+			{ 
 				try {
 					if(tableauCases[X+a][Y+b].getValeur() == 0)
+					{
 						tableauCases[X+a][Y+b].setDecouverte(true);
-				}
-				catch(ArrayIndexOutOfBoundsException e) {} // si on dépasse la taille de la matrice
-				}
+						tableauCases[X][Y].setDrapeau(true);	
+						if(!tableauCases[X+a][Y+b].isDrapeau()) // pour détruire le StackOverflowError
+							propagationZero(X+a, Y+b);
+						for(int A=-1; A<2; A++)
+							for(int B=-1; B<2; B++)
+								tableauCases[X+a+A][Y+b+B].setDecouverte(true);
+					}
+					}
+				catch(ArrayIndexOutOfBoundsException e) {} // si on dépasse la taille matrice
+			}
 	}
 	
 	void reglageDifficulte(Difficulte diff) {

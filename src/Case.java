@@ -8,6 +8,7 @@ public class Case {
 	
 	public boolean isBombe()		{ return bombe; }
 	public boolean isDecouverte() 	{ return decouverte; }
+	public boolean isDrapeau()		{ return drapeau; }
 	public int getValeur()			{ return valeur; }
 	public void setBombe(boolean b)		{ bombe = b; }
 	public void setDecouverte(boolean d){ decouverte = d; }
