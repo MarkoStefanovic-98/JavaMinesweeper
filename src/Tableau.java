@@ -84,8 +84,6 @@ private	void propagationZero(int X, int Y)
 					if(tableauCases[X+a][Y+b].getValeur() == 0)
 					{
 						tableauCases[X+a][Y+b].setDecouverte(true);
-						tableauCases[X][Y].setDrapeau(true);	
-						if(!tableauCases[X+a][Y+b].isDrapeau()) // pour détruire le StackOverflowError
 							propagationZero(X+a, Y+b);
 						for(int A=-1; A<2; A++)
 							for(int B=-1; B<2; B++)
